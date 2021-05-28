@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -7,7 +6,8 @@ import (
 	"os"
 	"errors"
 	"database/sql"
-	"github.com/go-sql-driver/mysql"
+
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -26,12 +26,11 @@ func main() {
 	}
 
 	fmt.Println("Connected!")
-	var city City
-    if err := db.Get(&city, "SELECT * FROM city WHERE Name='Tokyo'"); errors.Is(err, sql.ErrNoRows) {
-        log.Println("no such city Name=%s", "Tokyo")
-    } else if err != nil {
-        log.Fatalf("DB Error: %s", err)
-    }
+	cities := []City{}
+	db.Select(&cities, "SELECT * FROM city WHERE CountryCode='JPN'")
 
-	fmt.Printf("Tokyoの人口は%d人です\n", city.Population)
+	fmt.Println("日本の都市一覧")
+	for _, city := range cities {
+		fmt.Printf("都市名: %s, 人口: %d人\n", city.Name, city.Population)
+	}
 }
